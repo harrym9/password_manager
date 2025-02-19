@@ -1,4 +1,5 @@
 from tkinter import *
+from tkinter import messagebox
 
 
 # ---------------------------- PASSWORD GENERATOR ------------------------------- #
@@ -8,9 +9,22 @@ def save_password():
     service_name = service.get()
     email_name = email.get()
     pass_code = password.get()
-    with open("data.txt", "a") as data:
-        data.write(f"{service_name.title()} | {email_name.lower()} | {pass_code}")
-        data.write("\n")
+
+    if service_name == "":
+        messagebox.showinfo(title="Oops", message="Please fill service / website")
+    elif pass_code == "":
+        messagebox.showinfo(title="Oops", message="Please fill password")
+    elif email_name == "":
+        messagebox.showinfo(title="Oops", message="Please fill email")
+    else:
+        is_ok = messagebox.askokcancel(title=service_name, message=f"There are details:"
+                                                                   f"\n Email / Username: {email_name}\n Password: {pass_code}")
+        if is_ok:
+            with open("data.txt", "a") as data:
+                data.write(f"{service_name.title()} | {email_name.lower()} | {pass_code}\n")
+                # clear the entries
+                service.delete(0, END)
+                password.delete(0, END)
 
 
 # ---------------------------- UI SETUP ------------------------------- #
@@ -37,7 +51,10 @@ service = service_entry = Entry(width=51)
 service_entry.grid(row=1, column=1, columnspan=2)
 service.focus()
 email = email_entry = Entry(width=51)
+
+# You can change the default email with your own email :D or fully delete this line
 email.insert(0, "gayratrahmatulayev8@gmail.com")
+
 email_entry.grid(row=2, column=1, columnspan=2)
 password = password_entry = Entry(width=32)
 password_entry.grid(row=3, column=1)
