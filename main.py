@@ -1,14 +1,14 @@
 from tkinter import *
 from tkinter import messagebox
 from random import randint, shuffle, choice
-import pyperclip
+import pyperclip, json
 
 
 # ---------------------------- PASSWORD GENERATOR ------------------------------- #
 def generate_password():
     letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u',
-               'v','w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q',
-               'R','S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+               'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
+               'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
     numbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
     symbols = ['!', '#', '$', '%', '&', '(', ')', '*', '+']
 
@@ -31,6 +31,12 @@ def save_password():
     service_name = service.get()
     email_name = email.get()
     pass_code = password.get()
+    new_data = {
+        service_name: {
+            "email": email_name,
+            "password": pass_code,
+        }
+    }
 
     if service_name == "":
         messagebox.showinfo(title="Oops", message="Please fill service / website")
@@ -39,12 +45,21 @@ def save_password():
     elif email_name == "":
         messagebox.showinfo(title="Oops", message="Please fill email")
     else:
-        is_ok = messagebox.askokcancel(title=service_name, message=f"There are details:"
-                                                                   f"\n Email / Username: {email_name}\n Password: {pass_code}")
+        is_ok = messagebox.askokcancel(title=service_name, message=f"There are details:"f"\n "
+                                                                   f"Email / Username: {email_name}\n "
+                                                                   f"Password: {pass_code}")
         if is_ok:
-            with open("data.txt", "a") as data:
-                data.write(f"{service_name.title()} | {email_name.lower()} | {pass_code}\n")
-                # clear the entries
+            try:
+                with open("data.json", "r") as data_file:
+                    data = json.load(data_file)
+                    data.update(new_data)
+            except FileNotFoundError:
+                with open("data.json", "w") as data_file:
+                    json.dump(new_data, data_file, indent=4)
+            else:
+                with open("data.json", "w") as data_file:
+                    json.dump(data, data_file, indent=4)
+            finally:
                 service.delete(0, END)
                 password.delete(0, END)
 
