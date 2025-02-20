@@ -21,16 +21,16 @@ def generate_password():
     final_password = "".join(password_list)
 
     # clear entry and put the final password
-    password.delete(0, END)
-    password.insert(0, final_password)
+    password_entry.delete(0, END)
+    password_entry.insert(0, final_password)
     pyperclip.copy(final_password)
 
 
 # ---------------------------- SAVE PASSWORD ------------------------------- #
 def save_password():
-    service_name = service.get()
-    email_name = email.get()
-    pass_code = password.get()
+    service_name = service_entry.get()
+    email_name = email_entry.get()
+    pass_code = password_entry.get()
     new_data = {
         service_name: {
             "email": email_name,
@@ -60,8 +60,25 @@ def save_password():
                 with open("data.json", "w") as data_file:
                     json.dump(data, data_file, indent=4)
             finally:
-                service.delete(0, END)
-                password.delete(0, END)
+                service_entry.delete(0, END)
+                password_entry.delete(0, END)
+
+
+# -------------------------- FIND PASSWORD ---------------------------- #
+def find_password():
+    try:
+        with open("data.json", "r") as data_file:
+            current = json.load(data_file)
+    except FileNotFoundError:
+        messagebox.showinfo(title="Error", message="You haven't added any information yet.")
+    except KeyError:
+        messagebox.showinfo(title="Error", message=f"No details for the {service_entry.get()} exists")
+    else:
+        email = current[service_entry.get()]["email"]
+        password = current[service_entry.get()]["password"]
+        messagebox.showinfo(title=service_entry.get(), message=f"Email: {email}\n"
+                                                               f"Password: {password}\n"
+                                                               f"PASSWORD IS COPIED!")
 
 
 # ---------------------------- UI SETUP ------------------------------- #
@@ -78,27 +95,33 @@ canvas.grid(column=1, row=0)
 # Labels
 service_label = Label(text="Service/Website:")
 service_label.grid(column=0, row=1)
+
 email_label = Label(text="Email/Username:")
 email_label.grid(column=0, row=2)
+
 password_label = Label(text="Password:")
 password_label.grid(column=0, row=3)
 
 # Entries
-service = service_entry = Entry(width=51)
-service_entry.grid(row=1, column=1, columnspan=2)
-service.focus()
-email = email_entry = Entry(width=51)
+service_entry = Entry(width=32)
+service_entry.grid(row=1, column=1)
+service_entry.focus()
 
 # You can change the default email with your own email :D or fully delete this line
-email.insert(0, "gayratrahmatulayev8@gmail.com")
-
+email_entry = Entry(width=51)
+email_entry.insert(0, "your.own@email.com")
 email_entry.grid(row=2, column=1, columnspan=2)
-password = password_entry = Entry(width=32)
+
+password_entry = Entry(width=32)
 password_entry.grid(row=3, column=1)
 
 # Buttons
+search_button = Button(text="Search", width=14, command=find_password)
+search_button.grid(row=1, column=2)
+
 generate_button = Button(text="Generate password", width=14, command=generate_password)
 generate_button.grid(row=3, column=2)
+
 add_button = Button(text="Add password", width=43, command=save_password)
 add_button.grid(row=4, column=1, columnspan=2)
 
