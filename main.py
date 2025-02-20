@@ -71,14 +71,19 @@ def find_password():
             current = json.load(data_file)
     except FileNotFoundError:
         messagebox.showinfo(title="Error", message="You haven't added any information yet.")
-    except KeyError:
-        messagebox.showinfo(title="Error", message=f"No details for the {service_entry.get()} exists")
     else:
-        email = current[service_entry.get()]["email"]
-        password = current[service_entry.get()]["password"]
-        messagebox.showinfo(title=service_entry.get(), message=f"Email: {email}\n"
-                                                               f"Password: {password}\n"
-                                                               f"PASSWORD IS COPIED!")
+        service = service_entry.get()
+        if service == "":
+            messagebox.showinfo(title="Oops", message=f"Please type a service / website")
+        elif service in current:
+            email = current[service]["email"]
+            password = current[service]["password"]
+            pyperclip.copy(password)
+            messagebox.showinfo(title=service, message=f"Email: {email}\n"
+                                                       f"Password: {password}\n"
+                                                       f"PASSWORD IS COPIED!")
+        else:
+            messagebox.showinfo(title="Doesn't exist", message=f"The {service} doesn't exist!")
 
 
 # ---------------------------- UI SETUP ------------------------------- #
